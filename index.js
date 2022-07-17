@@ -64,7 +64,7 @@ const generateRTCToken = (req, resp) => {
 };
 
 app.get("/", (req, res) => {
-  res.send({ name: "agora token generator" });
+  res.send({ name: "Abiodun Samuel - agora token generator" });
 });
 app.get("/rtc/:channel/:role/:tokentype/:uid", nocache, generateRTCToken);
 

@@ -59,7 +59,7 @@ const generateRTCToken = (req, resp) => {
   } else {
     return resp.status(500).json({ error: "token type is invalid" });
   }
-  return resp.json({ token, channelName, uid });
+  return resp.json({ token, channelName, uid , process.env.APP_ID});
 };
 
 app.get("/", (req, res) => {

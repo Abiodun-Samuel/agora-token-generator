@@ -1,0 +1,23 @@
+{
+  "name": "agora-token-generator",
+  "version": "1.0.0",
+  "description": "testing agora token generator",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "nodejs",
+    "expressjs",
+    "agora",
+    "token"
+  ],
+  "author": "abiodun samuel",
+  "license": "ISC",
+  "dependencies": {
+    "agora-access-token": "^2.0.4",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.19"
+  }
+}

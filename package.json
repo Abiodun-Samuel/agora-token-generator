@@ -4,7 +4,8 @@
   "description": "testing agora token generator",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [
     "nodejs",
@@ -16,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "agora-access-token": "^2.0.4",
+    "axios": "^0.27.2",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "nodemon": "^2.0.19"

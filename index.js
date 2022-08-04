@@ -95,14 +95,18 @@ const startRecording = async (req, res) => {
   const resource = req.body.resource;
   const mode = req.body.mode;
   const url = req.body.url;
+  const channel = req.body.channel
+  const uid = req.body.uid;
+  const token = req.body.token;
 
   try {
     const start = await axios.post(
       `https://api.agora.io/v1/apps/${appId}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
       {
-        cname: req.body.channel,
-        uid: req.body.uid,
+        cname: channel,
+        uid: uid,
         clientRequest: {
+          token: token,
           extensionServiceConfig: {
             errorHandlePolicy: "error_abort",
             extensionServices: [

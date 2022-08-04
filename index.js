@@ -66,7 +66,7 @@ const generateRTCToken = (req, resp) => {
 };
 
 const Authorization = `Basic ${Buffer.from(
-  `${process.env.CUSTOMERID}:${process.env.CUSTOMER_SECRET}`
+  `${process.env.CUSTOMER_KEY}:${process.env.CUSTOMER_SECRET}`
 ).toString("base64")}`;
 
 const generateResourceId = async (req, res) => {

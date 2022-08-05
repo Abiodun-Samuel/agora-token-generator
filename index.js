@@ -2,7 +2,16 @@ require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
+const cors = require("cors");
 const app = express();
+
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const nocache = (_, resp, next) => {
@@ -95,7 +104,7 @@ const startRecording = async (req, res) => {
   const resource = req.body.resource;
   const mode = req.body.mode;
   const url = req.body.url;
-  const channel = req.body.channel
+  const channel = req.body.channel;
   const uid = req.body.uid;
   const token = req.body.token;
 
@@ -183,6 +192,106 @@ const queryRecording = async (req, res) => {
   }
 };
 
+// composite recording
+const generateResourceIdComposite = async (req, res) => {
+  try {
+    const acquire = await axios.post(
+      `https://api.agora.io/v1/apps/${process.env.APP_ID}/cloud_recording/acquire`,
+      {
+        cname: req.body.channel,
+        uid: req.body.uid,
+        clientRequest: {
+          resourceExpiredHour: 24,
+          scene: 0,
+        },
+      },
+      { headers: { Authorization } }
+    );
+
+    res.send(acquire.data);
+  } catch (error) {
+    res.send(error);
+  }
+};
+
+const startCompositeRecording = async (req, res) => {
+  const appId = process.env.APP_ID;
+  const resource = req.body.resource;
+  const mode = req.body.mode;
+  const url = req.body.url;
+  const channel = req.body.channel;
+  const uid = req.body.uid;
+  const token = req.body.token;
+
+  try {
+    const start = await axios.post(
+      `https://api.agora.io/v1/apps/${appId}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
+      {
+        uid: uid,
+        cname: channel,
+        clientRequest: {
+          token: token,
+          recordingConfig: {
+            maxIdleTime: 30,
+            streamTypes: 2,
+            audioProfile: 1,
+            channelType: 0,
+            videoStreamType: 0,
+            transcodingConfig: {
+              height: 640,
+              width: 360,
+              bitrate: 500,
+              fps: 15,
+              mixedVideoLayout: 1,
+              backgroundColor: "#FF0000",
+            },
+            subscribeVideoUids: ["123", "456"],
+            subscribeAudioUids: ["123", "456"],
+            subscribeUidGroup: 0,
+          },
+          recordingFileConfig: {
+            avFileType: ["hls", "mp4"],
+          },
+          storageConfig: {
+            vendor: Number(process.env.vendor),
+            region: Number(process.env.region),
+            bucket: process.env.bucket,
+            accessKey: process.env.accessKey,
+            secretKey: process.env.secretKey,
+          },
+        },
+      },
+      { headers: { Authorization } }
+    );
+
+    res.send(start.data);
+  } catch (error) {
+    res.send(error);
+  }
+};
+
+const stopCompositeRecording = async (req, res) => {
+  const appId = process.env.APP_ID;
+  const resource = req.body.resource;
+  const sid = req.body.sid;
+  const mode = req.body.mode;
+
+  try {
+    const stop = await axios.post(
+      `https://api.agora.io/v1/apps/${appId}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+      {
+        cname: req.body.channel,
+        uid: req.body.uid,
+        clientRequest: {},
+      },
+      { headers: { Authorization } }
+    );
+    res.send(stop.data);
+  } catch (error) {
+    res.send(error);
+  }
+};
+
 app.get("/", (req, res) => {
   res.send({ name: "Agora Server" });
 });
@@ -192,6 +301,11 @@ app.post("/acquire", nocache, generateResourceId);
 app.post("/start", nocache, startRecording);
 app.post("/stop", nocache, stopRecording);
 app.post("/query", nocache, queryRecording);
+
+//composite recording
+app.post("/acquire-composite-recording", nocache, generateResourceIdComposite);
+app.post("/start-composite-recording", nocache, startCompositeRecording);
+app.post("/stop-composite-recording", nocache, stopCompositeRecording);
 
 app.listen(process.env.PORT, () => {
   console.log(`Listening on port: ${process.env.PORT}`);

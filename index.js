@@ -60,7 +60,7 @@ const generateRTCToken = (req, resp) => {
   }
   const currentTime = Math.floor(Date.now() / 1000);
   const privilegeExpireTime = currentTime + expireTime;
-  const appid = process.env.APP_CERTIFICATE;
+  const appid = process.env.APP_ID;
   let token;
   if (req.params.tokentype === "userAccount") {
     token = RtcTokenBuilder.buildTokenWithAccount(

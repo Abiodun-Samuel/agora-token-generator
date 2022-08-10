@@ -4,13 +4,13 @@ const axios = require("axios");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
 const cors = require("cors");
 const app = express();
+const Pusher = require("pusher");
 
 const corsOptions = {
   origin: "*",
   credentials: true,
   optionSuccessStatus: 200,
 };
-
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -19,6 +19,18 @@ const nocache = (_, resp, next) => {
   resp.header("Expires", "-1");
   resp.header("Pragma", "no-cache");
   next();
+};
+
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_APP_KEY,
+  secret: process.env.PUSHER_APP_SECRET,
+  cluster: process.env.PUSHER_APP_CLUSTER,
+  useTLS: true,
+});
+
+const notaryReady = async (req, res) => {
+  await pusher.trigger("tone-development", "ready-ready", { ready: true });
 };
 
 const generateRTCToken = (req, resp) => {
@@ -303,6 +315,9 @@ app.post("/acquire", nocache, generateResourceId);
 app.post("/start", nocache, startRecording);
 app.post("/stop", nocache, stopRecording);
 app.post("/query", nocache, queryRecording);
+
+// real time communication with pusher js
+app.post("/notary-ready", nocache, notaryReady);
 
 //composite recording
 app.post("/acquire-composite-recording", nocache, generateResourceIdComposite);

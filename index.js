@@ -93,7 +93,6 @@ const generateResourceId = async (req, res) => {
       },
       { headers: { Authorization } }
     );
-
     res.send(acquire.data);
   } catch (error) {
     res.send(error);
@@ -149,7 +148,6 @@ const startRecording = async (req, res) => {
       },
       { headers: { Authorization } }
     );
-
     res.send(start.data);
   } catch (error) {
     res.send(error);
